@@ -1,4 +1,4 @@
-<img src="https://github.com/collinsmc23/tde101/blob/main/images/TD101-Logo.jpg" alt="The Threat Detections Engineering Project 101(2).png" width="800" height="300">
+<img src="https://github.com/collinsmc23/tde101/blob/main/Notes/images/TD101-Logo.jpg" alt="The Threat Detections Engineering Project 101(2).png" width="800" height="300">
 
 # 🔒 The Threat Detection Engineering 101 Project (TDE101)
 
@@ -13,7 +13,7 @@ The overall goal is to expose myself to what a "day in the life" might look like
 
 ## The TDE101 Lab Topology
 
-<img src="https://github.com/collinsmc23/tde101/blob/main/images/The%20Threat%20Detections%20Engineering%20Project%20101%20Netork%20Toplogy.png" alt="The Threat Detections Engineering Project 101(2).png" width="751" height="662">
+<img src="https://github.com/collinsmc23/tde101/blob/main/Notes/images/The%20Threat%20Detections%20Engineering%20Project%20101%20Netork%20Toplogy.png" width="751" height="662">
 
 ### TDE101 Breakdown
 

@@ -1,0 +1,68 @@
+---
+- hosts: digital_ocean_droplets
+  become: yes  # Use sudo to execute tasks
+
+  tasks:
+    - name: Create a new user
+      user:
+        name: corp-server-user
+        state: present
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+
+    - name: Set password for the new user
+      user:
+        name: corp-server-user
+        password: "{{ 'tde101' | password_hash('sha512') }}"
+
+    - name: Ensure sudo priveleges for the new user
+      copy:
+        dest: /etc/sudoers.d/corp-server-user
+        content: "corp-server-user ALL=(ALL) NOPASSWD:ALL\n"
+        mode: '0440'
+
+    - name: Enable UFW
+      ufw:
+          state: enabled
+
+    - name: Allow UFW Port 22
+      ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+
+    - name: Allow UFW Port 8220
+      ufw:
+        rule: allow
+        port: '8220'
+        proto: tcp
+
+    - name: Allow UFW Port 9200
+      ufw:
+        rule: allow
+        port: '9200'
+        proto: tcp
+
+
+    - name: Reload UFW to apply changes
+      ufw:
+        state: reloaded
+
+    - name: Download Elastic Agent tarball
+      shell: curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-7.17.23-linux-x86_64.tar.gz
+      args:
+        chdir: /tmp
+
+    - name: Extract Elastic Agent tarball
+      shell: tar xzvf elastic-agent-7.17.23-linux-x86_64.tar.gz
+      args:
+        chdir: /tmp
+
+    - name: Install Elastic Agent as Root
+      become: yes
+      become_user: root
+      # Here you can add your URL and agent token if environment variables are not working.
+      shell: /tmp/elastic-agent-7.17.23-linux-x86_64/elastic-agent install --url="{{ elastic_agent_url }}" --enrollment-token="{{ elastic_agent_token }}" --force --insecure
+      args:
+        creates: /etc/elastic-agent/elastic-agent.yml

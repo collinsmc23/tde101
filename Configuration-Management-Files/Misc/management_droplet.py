@@ -9,7 +9,7 @@ load_dotenv(dotenv_path="/home/grant/projects/tde101/Configuration-Management-Fi
 
 # Replace these values with your own
 DO_TOKEN = os.getenv("DO_TOKEN")
-HONEYPY_DROPLET_ID = os.getenv("DROPLET_ID")
+HONEYPY_DROPLET_ID = os.getenv("HONEYPY_DROPLET_ID")
 
 T_POT_DROPLET_ID = os.getenv("T_POT_DROPLET_ID")
 

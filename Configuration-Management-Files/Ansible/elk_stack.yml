@@ -1,0 +1,67 @@
+---
+- name: Install Elasticsearch, Kibana, and Logstash.
+  hosts: all
+  become: yes
+
+  vars:
+    elasticsearch_version: "7.17.23"  # Adjust to your required version
+
+  tasks:
+    - name: Perform cache update on APT.
+      become: true
+      apt:
+        update_cache: yes
+    - name: Install required dependencies
+      apt:
+        name: 
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - nginx
+        state: present
+    - name: Install Elastic's GPG key.
+      apt_key:
+        url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+    - name: Add Elastic Repository
+      ansible.builtin.apt_repository:
+        repo: "deb https://artifacts.elastic.co/packages/7.x/apt stable main"
+        state: present
+    - name: Update APT cache.
+      apt:
+        update_cache: yes
+    - name: Install Elasticsearch
+      apt:
+        name: "elasticsearch"
+        state: present
+    - name: Install Kibana.
+      apt:
+        name: "kibana"
+        state: present
+    - name: Install Logstash.
+      apt:
+        name: "logstash"
+        state: present
+    - name: Enable and start ELK services.
+      ansible.builtin.systemd_service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - elasticsearch
+        - kibana
+        - logstash
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+
+    - name: Allow OpenSSH and ELK ports
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+      loop:
+        - 22
+        - 8200
+        - 9200

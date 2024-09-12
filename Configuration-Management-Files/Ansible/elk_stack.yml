@@ -52,11 +52,9 @@
         - elasticsearch
         - kibana
         - logstash
-
     - name: Enable UFW
       ufw:
         state: enabled
-
     - name: Allow OpenSSH and ELK ports
       ufw:
         rule: allow
@@ -65,3 +63,5 @@
         - 22
         - 8200
         - 9200
+        - 80
+        - 443

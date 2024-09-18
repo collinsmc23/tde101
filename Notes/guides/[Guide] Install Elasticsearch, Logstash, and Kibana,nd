@@ -2,6 +2,32 @@
 
 In this step-by-step guide, you will install the Elasticsearch, Logstash, and Kibana services (ELK Stack) on Ubuntu Linux Server 22.04. The ELK tenant will be accessed through a baseline NGINX web server accessible through a publicly routed domain of your choosing. You will also enable and configure basic authentication (username and password) to lock access.
 
+### Ansible Playbook
+
+Ensure ansible is installed:
+`python -m pip install --user ansible`
+
+Install `sshpass` on control node to use SSH basic authentication in ansible hosts.
+`sudo apt-get install sshpass`
+
+Create a new ansible hosts (name `hosts`) file, add your Digital Ocean droplet IP addresses.
+```
+honeypy ansible_host={ip address} ansible_user=root ansible_ssh_pass="{{ ssh_pass }}"
+tpot ansible_host={ip address} ansible_user=root ansible_ssh_pass="{{ ssh_pass }}"
+```
+
+Ensure you can ping: `ansible -i . all -m ping -e "ssh_pass={password}`
+
+Download playbook (`elk_stack.yml`. Make sure hosts file is in the same directory. 
+
+Run the following command:
+
+```
+ansible-playbook -i . elk_stack.yml -e "ssh_pass=password" 
+```
+
+💡 The supplied Ansible playbook will download and install the baseline Elasticsearch, Kibana, and Logstash packages, enable and start with systemd, and open ports 22 (SSH), 9200 (Elasticsearch), 8220 (Fleet Server), and 80/443 (HTTP/S). NGINX and the fleet server will need to be set up (through the manual steps) in order to access the Kibana front-end dashboard.
+
 # Elasticsearch
 
 *Source: https://www.digitalocean.com/community/tutorials/how-to-install-elasticsearch-logstash-and-kibana-elastic-stack-on-ubuntu-22-04#prerequisites*
@@ -10,7 +36,7 @@ In this step-by-step guide, you will install the Elasticsearch, Logstash, and Ki
 
 Download Elasticsearch GPG Public Key and add it into APT.
 
-`curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch |sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg`
+`curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg`
 
 `echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list`
 
@@ -55,12 +81,11 @@ Start Kibana service service `systemctl start kibana`.
 💡 The `kibana.yml` file provides configuration options for Kibana. To edit the configuration file, go to: `/etc/kibana/kibana.yml`.
 
 # Domain Name
+In order to publicly access the ELK tenant, a domain name needs to be used. 
 
-In order to publicly access the ELK tenant, a domain name needs to be used.
+I choose to use Cloudflare as my domain name registrar and management. 
 
-I choose to use Cloudflare as my domain name registrar and management.
-
-You must add your VPS public IP address as an `A` record to your root-level domain.
+You must add your VPS public IP address as an `A` record to your root-level domain. 
 
 # NGINX
 
@@ -186,3 +211,4 @@ Create a new Kibana keystore with `sudo /usr/share/kibana/bin/kibana-keystore cr
 Add the `kibana_system` user to the Kibana keystore with `/usr/share/kibana/bin/kibana-keystore add elasticsearch.password`.
 
 Restart the Kibana with `sudo systemctl restart kibana`.
+

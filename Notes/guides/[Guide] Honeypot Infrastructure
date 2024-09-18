@@ -1,0 +1,58 @@
+# Guide
+In this step-by-step guide, you will provision and install several instances to host the honeypot network being used in TDE101. Leveraging DigitalOcean droplets, you will provision the baseline configurations for several Ubuntu 22.04 servers. Each server will represent a honeypot node or instance running a specific type of honeypot. After implementing the configurations, you will install the Elastic Agent, the honeypot types (T-POT and HONYPY) and finally add the specific log files to for the Elastic Agent to collect.
+
+If you would like to automatically configure the honeypot node, use the following Ansible playbook. This playbook will do the following:
+- Create new user, `corp-server-user`.
+- Set default password `tde101`.
+- Add `corp-server-user` to `/etc/sudoers`.
+- Enable and allow UFW ports `2200`, `9200`, and `22`
+- Download Elastic Agent. Must specify fleet server and enrollment token.
+
+### Ansible Playbook
+
+Ensure ansible is installed:
+`python -m pip install --user ansible`
+
+Install `sshpass` on control node to use SSH basic authentication in ansible hosts.
+`sudo apt-get install sshpass`
+
+Create a new ansible hosts (name `hosts`) file, add your Digital Ocean droplet IP addresses.
+```
+honeypy ansible_host={ip-address} ansible_user=root ansible_ssh_pass="{{ ssh_pass }}"
+tpot ansible_host={ip-address} ansible_user=root ansible_ssh_pass="{{ ssh_pass }}"
+```
+
+Ensure you can ping: `ansible -i . all -m ping -e "ssh_pass={password}"`
+
+Download playbook (`configure_honeypot_instance.yml`. Make sure hosts file is in the same directory. 
+
+Run the following command:
+
+```
+ansible-playbook -i . configure_honeypot_instance.yml -e "ssh_pass=@theTDE101project" -e "elastic_agent_url=http://{public-ip-address}:8220" -e "elastic_agent_tok
+en=NGJOLWdaRUI4VFl1b0twY05EY1I6dThPWlRHWTBRaHF1OWNZYkVhNEpIQQ=="
+```
+
+💡 You may need to hardcode the `elastic_agent_url` and `elastic_agent_token` values in the Ansible playbook.
+
+# Step-by-Step
+
+### Step 1
+Provision new Digital Ocean droplet. Follow Digital Ocean's wizard.
+
+### Step 2
+SSH and create new user. Choose basic SSH Authentication (password).
+
+### Step 3
+Install Elastic agent, enroll with proper Fleet Server and enrollment token.
+
+Refer to Elasticsearch -> Ingest Data
+
+
+# Commands & Scripts
+- Located in TDE101 ➡ Configuration-Management-Files ➡ Misc is `management_droplet.py`. This script allows you to turn on and off DigitalOcean droplets to save on compute costs.
+	- Usage: `python3 management_droplet.py -t [type] [-o] [-f]`:
+		- `-t`: Specify type. (ex. `-t tpot honeypy`).
+		- `-o`: Turn honeypot on.
+		- `-f`: Turn honeypot off.
+	- `curl http://169.254.169.254/metadata/v1/id`: Get Droplet ID.

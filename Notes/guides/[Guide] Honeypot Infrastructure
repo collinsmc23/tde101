@@ -29,8 +29,7 @@ Download playbook (`configure_honeypot_instance.yml`. Make sure hosts file is in
 Run the following command:
 
 ```
-ansible-playbook -i . configure_honeypot_instance.yml -e "ssh_pass=@theTDE101project" -e "elastic_agent_url=http://{public-ip-address}:8220" -e "elastic_agent_tok
-en=NGJOLWdaRUI4VFl1b0twY05EY1I6dThPWlRHWTBRaHF1OWNZYkVhNEpIQQ=="
+ansible-playbook -i . configure_honeypot_instance.yml -e "ssh_pass={token}" -e "elastic_agent_url=http://{public-ip-address}:8220" -e "elastic_agent_token={token}"
 ```
 
 💡 You may need to hardcode the `elastic_agent_url` and `elastic_agent_token` values in the Ansible playbook.

@@ -1,5 +1,6 @@
 Configuration-Management-Files/Misc/variables.env
 Configuration-Management-Files/Ansible/hosts*
+Configuration-Management-Files/Misc/.vagrant*
 Logo/Logo-PS.psd
 Logo/Logo-PS-2.psd
 

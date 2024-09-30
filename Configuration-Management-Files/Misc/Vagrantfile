@@ -1,0 +1,56 @@
+Vagrant.configure("2") do |config|
+    # Using Windows 11 Base Box: https://portal.cloud.hashicorp.com/vagrant/discover/gusztavvargadr/windows-11-23h2-enterprise
+    config.vm.box = "gusztavvargadr/windows-11-23h2-enterprise" 
+    config.vm.box_version = "2302.0.2408"
+
+    # Wait for 10 minutes
+    config.vm.boot_timeout = 600 
+    #config.vm.network "forwarded_port", guest: 5985, host: 55985, id: "winrm"
+
+    # Assign static IP address. Can change this to type: 'dhcp' if dynamic is needed.
+    config.vm.network "public_network", type: "dhcp"
+
+    # Comment out the below if not using WSL.
+    config.vm.synced_folder '.', '/vagrant', disabled: true
+
+    # Configure the VM settings,
+    config.vm.provider "virtualbox" do |v|
+      v.name = "[tde101] Windows_11VM"
+      v.memory = 4096
+      v.cpus = 2
+      v.gui = true
+    end
+  
+    # Setup administrator credentials
+    config.vm.communicator = "winrm"
+    config.winrm.username = "vagrant"
+    config.winrm.password = "vagrant"
+    config.winrm.transport = "plaintext"
+    config.winrm.basic_auth_only = true
+    config.winrm.transport = "negotiate"
+    config.winrm.timeout = 300 
+    config.winrm.retry_limit = 5
+
+    config.vm.provision "shell", inline: <<-SHELL
+        powershell -ExecutionPolicy Bypass -Command "Write-Host 'Hello from PowerShell'"
+    SHELL
+end
+  
+#     # Provisioning with PowerShell
+#     config.vm.provision "shell", inline: <<-SHELL
+#       # Install Chocolatey package manager
+#       Set-ExecutionPolicy Bypass -Scope Process -Force;
+#       [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072;
+#       iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+  
+#       # Install Git and other common tools
+#       choco install git -y
+#       choco install googlechrome -y
+#       choco install firefox -y
+  
+#       # Set up additional customizations or software installations here
+#       Write-Host "Windows 11 box configured!"
+#     SHELL
+#   end
+  
+  

@@ -8,6 +8,44 @@ Choose Windows Enterprise Edition or Windows Pro for the best simulation of a bu
 
 Guide: https://kfocus.org/wf/vbox-w11.html
 
+### Vagrant via `VagrantFile` (IaC)
+Vagrant is an open-source tool that simplifies the creation and management of virtualized development environments using configurable, reproducible, and portable workflows. Leveraging Vagrant via `VagrantFile`, the baseline Windows 11 instance can be provisioned. You will still need to disable Windows Defender, download your browser of choice, and Atomic Red Team.
+
+Vagrant offers native support for VirtualBox, Hyper-V, and Docker.
+
+Download Vagrant by following instruction in [Hashicorp Install Vagrant](https://developer.hashicorp.com/vagrant/tutorials/getting-started/getting-started-install?ajs_aid=dbd5115c-b144-49e3-bfc0-ca68e872595d&product_intent=vagrant).
+
+Located in `/Configuration-Management-Files` --> Misc will be a file titled `Vagrantfile`. 
+
+Follow the comments in the Vagrant file, you can customize hostname, password, VM name, etc.
+
+Use the following commands to provision and destroy the VM provisioned by Vagrant.
+- `vagrant init`: Initialize a new, blank `Vagrantfile` (if needed).
+- `vagrant up [--debug]`: Used to provision new VM.
+- `vagrant destroy`: Destroy VM.
+- `vagrant resume`: Resume deployment if error or manual intervention happens.
+- `--debug`: Use this flag for verbose stdout. Best used for error handling.
+
+#### Vagrant Boxes
+Vagrant leverages "Vagrant Boxes". These are base images for an environment or OS. HashiCorp provides support official boxes or Vagrant Cloud can be used. In the Vagrant File, I am using a custom box to deploy a baseline Windows 11 23H2 Enterprise edition. The HashiCorp supported boxes are not Windows, so I had to use a custom one by `gusztavvargadr` (thanks to ChatGPT). These boxes appear to be updated on a frequent basis.
+
+#### Windows Subsystem For Linux (WSL)
+*Source: https://dev.to/sfpear/vagrant-and-virtualbox-on-windows-11-and-wsl2-395p*
+
+I am using WSL Ubuntu 22.04 as my main interface for this project (I don't want to use Windows...). If you are using something similar, follow the above source to change a few configuration options. Specifically...
+
+```
+export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
+export PATH="$PATH:/mnt/c/Program Files/Oracle/VirtualBox"
+
+export VAGRANT_WSL_WINDOWS_ACCESS_USER_HOME_PATH="/mnt/c/<path-to-folder-where-Vagrantfile-is>"
+```
+
+Add this line to your Vagrantfile to be able to have a project in your ubuntu file system:
+
+config.vm.synced_folder '.', '/vagrant', disabled: true
+
+
 # Configure Detection Generator
 
 ## Disable Windows Defender
@@ -45,6 +83,7 @@ To disable permanently, follow this guide: https://lazyadmin.nl/win-11/turn-off-
 # Atomic Red Team
 *Source: https://aashishsec.medium.com/atomic-red-team-installation-2698b7bdc73b*
 *Source: https://medium.com/mii-cybersec/microsoft-defender-for-endpoint-article-series-simulate-attack-with-atomic-red-team-e932a8a17271*
+*Source: https://github.com/redcanaryco/invoke-atomicredteam/wiki/Installing-Invoke-AtomicRedTeam*
 
 Atomic Red Team is an open-source project designed to test detection and response capabilities. It provides a small library of self-contained test ("atomics") that map directly to the MITRE ATT&CK framework. 
 
